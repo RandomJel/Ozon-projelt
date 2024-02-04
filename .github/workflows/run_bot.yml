@@ -1,0 +1,27 @@
+name: Run Bot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  your_job_name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set API_TOKEN as environment variable
+        run: echo "API_TOKEN=${{ secrets.API_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Run Python script
+        run: python main.py
