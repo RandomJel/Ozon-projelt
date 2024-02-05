@@ -18,11 +18,8 @@ def set_commands_to_start():
 # Словарь для отслеживания состояний пользователей
 user_states = {}
 
-# /start
-@bot.message_handler(commands=['start'])
-def start(message):
-    set_commands_to_start()
-
+# menu
+def show_menu(message):
     # Создаем клавиатуру
     markup = types.ReplyKeyboardMarkup(row_width=2)
     item_compare = types.KeyboardButton('Сравнить данные')
@@ -30,6 +27,14 @@ def start(message):
     
     # Добавляем кнопки на клавиатуру
     markup.add(item_compare, item_help)
+
+    return markup
+
+# /start
+@bot.message_handler(commands=['start'])
+def start(message):
+    set_commands_to_start()
+    markup = show_menu(message)
 
     bot.reply_to(message, "Привет! Напиши /help, чтобы узнать, что я умею.", reply_markup=markup)
 
