@@ -12,7 +12,7 @@ def set_commands_to_start():
     bot.set_my_commands([
     telebot.types.BotCommand("/start", "Запустить бота"),
     telebot.types.BotCommand("/help", "Список команд"),
-    telebot.types.BotCommand("/compare", "Сравнить данные из таблицы")
+    telebot.types.BotCommand("/compare", "Показать наличие на складе")
     ])
 
 # Словарь для отслеживания состояний пользователей
@@ -22,7 +22,7 @@ user_states = {}
 def show_menu(message):
     # Создаем клавиатуру
     markup = types.ReplyKeyboardMarkup(row_width=2)
-    item_compare = types.KeyboardButton('Сравнить данные')
+    item_compare = types.KeyboardButton('Показать наличие склада')
     item_help = types.KeyboardButton('Помощь')
     
     # Добавляем кнопки на клавиатуру
@@ -44,11 +44,11 @@ def start(message):
 def help(message):
     bot.reply_to(message, """*И так... я умею*: 
 - _Анализирую таблицы в форматах_ `.xlsx` _и_ `.csv`
-- _Сравниваю данные из таблицы_
+- _Показываю наличие на складе_
 
 Команды:
 /start - запустить бота
-/compare - сравнить данные из таблицы
+/compare - Показать наличие на складе
 
 P.s
 Чтобы работать с ботом, для начала нужно отправить ему файл
@@ -74,17 +74,17 @@ def handle_document(message):
     # Сохраняем состояние пользователя
     user_states[user_id] = {'filename': filename}
 
-    bot.send_message(user_id, "Файл успешно загружен. Теперь вы можете выполнить команду /compare для сравнения данных.")
+    bot.send_message(user_id, "Файл успешно загружен.И хранится в боте теперь вы можете выполнить команду /compare Чтобы посмотреть что есть на складе.")
 
 # /compare
 @bot.message_handler(commands=['compare'])
-@bot.message_handler(func=lambda message: "Сравнить данные" in message.text)
+@bot.message_handler(func=lambda message: "Наличие на складе" in message.text)
 def compare_data(message):
     user_id = message.from_user.id
 
     # Проверяем, есть ли файл для сравнения
     if user_id not in user_states or 'filename' not in user_states[user_id]:
-        bot.send_message(user_id, "Для сравнения данных, пожалуйста, сначала загрузите файл.")
+        bot.send_message(user_id, "Для того чтобы посмотреть что есть на складе, пожалуйста, сначала загрузите файл.")
         return
 
     filename = user_states[user_id]['filename']  # Перенесено сюда
@@ -96,7 +96,7 @@ def compare_data(message):
         # Предварительная обработка столбца 'price'
         data['Цена товара'] = data['Цена товара'].replace(r'[\$,]', '', regex=True).astype(float)
 
-        # Сравниваем данные
+        # Смотрим файл
         if 'Название товара' not in data.columns:
             bot.send_message(user_id, "Файл не содержит столбца 'Название товара'.")
             return
@@ -114,8 +114,8 @@ def compare_data(message):
         bot.send_message(user_id, result_message)
 
     except Exception as e:
-        print(f"Ошибка при сравнении данных: {e}")
-        bot.send_message(user_id, "Произошла ошибка при сравнении данных.")
+        print(f"Ошибка при просмотре файла: {e}")
+        bot.send_message(user_id, "Произошла ошибка при просмотре файла.")
 
     finally:
         # Удаляем пользовательскую папку
